@@ -99,7 +99,7 @@ func Errorf(format string, v ...interface{}) {
 
 func (l *StdLogger) logPrintf(level Level, format string, v ...interface{}) {
 	if level >= l.MinLevel {
-		l.Lg.Printf(level.String()+format+"\n", v)
+		l.Lg.Output(3, fmt.Sprintf(level.String()+format, v...))
 	}
 }
 
