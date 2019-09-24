@@ -31,20 +31,28 @@ func (l Level) String() string {
 	return ""
 }
 
-type Logger struct {
+type Logger interface {
+	Tracef(format string, v ...interface{})
+	Debugf(format string, v ...interface{})
+	Infof(format string, v ...interface{})
+	Warnf(format string, v ...interface{})
+	Errorf(format string, v ...interface{})
+}
+
+type StdLogger struct {
 	MinLevel Level
 	Lg       *log.Logger
 }
 
 // New create a new logger instance
-func New(level Level, prefix string, out io.Writer, flag int) *Logger {
-	return &Logger{
+func New(level Level, prefix string, out io.Writer, flag int) *StdLogger {
+	return &StdLogger{
 		MinLevel: level,
 		Lg:       log.New(out, prefix, flag),
 	}
 }
 
-var std *Logger = New(INFO, "", os.Stdout, log.Lshortfile|log.LstdFlags)
+var std = New(INFO, "", os.Stdout, log.Lshortfile|log.LstdFlags)
 
 func sdtPrintf(level Level, format string, v ...interface{}) {
 	if std.MinLevel >= level {
@@ -70,4 +78,30 @@ func Warnf(format string, v ...interface{}) {
 
 func Errorf(format string, v ...interface{}) {
 	sdtPrintf(ERROR, format, v...)
+}
+
+func (l *StdLogger) logPrintf(level Level, format string, v ...interface{}) {
+	if l.MinLevel >= level {
+		l.Lg.Printf(level.String()+format+"\n", v)
+	}
+}
+
+func (l *StdLogger) Tracef(format string, v ...interface{}) {
+	l.logPrintf(TRACE, format, v...)
+}
+
+func (l *StdLogger) Debugf(format string, v ...interface{}) {
+	l.logPrintf(DEBUG, format, v...)
+}
+
+func (l *StdLogger) Infof(format string, v ...interface{}) {
+	l.logPrintf(INFO, format, v...)
+}
+
+func (l *StdLogger) Warnf(format string, v ...interface{}) {
+	l.logPrintf(WARN, format, v...)
+}
+
+func (l *StdLogger) Errorf(format string, v ...interface{}) {
+	l.logPrintf(ERROR, format, v...)
 }
