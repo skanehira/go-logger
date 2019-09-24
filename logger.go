@@ -17,6 +17,16 @@ const (
 	ERROR
 )
 
+const (
+	Ldate = 1 << iota
+	Ltime
+	Lmicroseconds
+	Llongfile
+	Lshortfile
+	LUTC
+	LstdFlags = Ldate | Ltime
+)
+
 var levelMap = map[Level]string{
 	TRACE: "[TRACE] ",
 	DEBUG: "[DEBUG] ",
@@ -53,7 +63,7 @@ func New(level Level, prefix string, out io.Writer, flag int) *StdLogger {
 	}
 }
 
-var std = New(INFO, "", os.Stdout, log.Lshortfile|log.LstdFlags)
+var std = New(INFO, "", os.Stdout, Lshortfile|LstdFlags)
 
 func sdtPrintf(level Level, format string, v ...interface{}) {
 	if level >= std.MinLevel {
