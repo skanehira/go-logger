@@ -60,6 +60,22 @@ func sdtPrintf(level Level, format string, v ...interface{}) {
 	}
 }
 
+func SetMinLevel(level Level) {
+	std.MinLevel = level
+}
+
+func SetOutput(out io.Writer) {
+	std.Lg.SetOutput(out)
+}
+
+func SetFlags(flag int) {
+	std.Lg.SetFlags(flag)
+}
+
+func SetPrefix(prefix string) {
+	std.Lg.SetPrefix(prefix)
+}
+
 func Tracef(format string, v ...interface{}) {
 	sdtPrintf(TRACE, format, v...)
 }
