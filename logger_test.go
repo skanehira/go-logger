@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"testing"
 )
@@ -26,7 +25,7 @@ func TestNew(t *testing.T) {
 	level := INFO
 	out := os.Stdout
 	prefix := "[gorilla]"
-	flag := log.LstdFlags
+	flag := LstdFlags
 
 	logger := New(level, prefix, out, flag)
 
@@ -73,7 +72,7 @@ func TestLevel(t *testing.T) {
 }
 
 func TestSetFunc(t *testing.T) {
-	testLogger := New(INFO, "", os.Stdout, log.Lshortfile)
+	testLogger := New(INFO, "", os.Stdout, Lshortfile)
 	oldLogger := std
 	std = testLogger
 	defer func() { std = oldLogger }()
@@ -96,7 +95,7 @@ func TestSetFunc(t *testing.T) {
 		errorf(t, prefix, std.Lg.Prefix())
 	}
 
-	flag := log.Ldate
+	flag := Ldate
 	SetFlags(flag)
 	if std.Lg.Flags() != flag {
 		errorf(t, flag, std.Lg.Flags())
