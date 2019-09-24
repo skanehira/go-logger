@@ -18,6 +18,8 @@ const (
 	ERROR
 )
 
+// flags is same as log pakcage
+// please see `go doc log.Ldate`
 const (
 	Ldate = 1 << iota
 	Ltime
@@ -148,4 +150,24 @@ func (l *StdLogger) Warnf(format string, v ...interface{}) {
 // Errorf output error log
 func (l *StdLogger) Errorf(format string, v ...interface{}) {
 	l.logPrintf(ERROR, format, v...)
+}
+
+// SetMinLevel set the log min level
+func (l *StdLogger) SetMinLevel(level Level) {
+	l.MinLevel = level
+}
+
+// SetOutput set the log output desitnation
+func (l *StdLogger) SetOutput(out io.Writer) {
+	l.Lg.SetOutput(out)
+}
+
+// SetFlags set the log flags
+func (l *StdLogger) SetFlags(flag int) {
+	l.Lg.SetFlags(flag)
+}
+
+// SetPrefix set the log prefix
+func (l *StdLogger) SetPrefix(prefix string) {
+	l.Lg.SetPrefix(prefix)
 }

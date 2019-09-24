@@ -71,35 +71,64 @@ func TestLevel(t *testing.T) {
 	}
 }
 
-func TestSetFunc(t *testing.T) {
-	testLogger := New(INFO, "", os.Stdout, Lshortfile)
-	oldLogger := std
-	std = testLogger
-	defer func() { std = oldLogger }()
+func TestSetFuncs(t *testing.T) {
+	t.Run("set properties to global logger instance", func(t *testing.T) {
+		testLogger := New(INFO, "", os.Stdout, Lshortfile)
+		oldLogger := std
+		std = testLogger
+		defer func() { std = oldLogger }()
 
-	SetMinLevel(TRACE)
-	if std.MinLevel != TRACE {
-		errorf(t, std.MinLevel.String(), TRACE.String())
-	}
+		SetMinLevel(TRACE)
+		if std.MinLevel != TRACE {
+			errorf(t, std.MinLevel.String(), TRACE.String())
+		}
 
-	out := stdout.(*os.File)
-	SetOutput(out)
-	lgout := std.Lg.Writer().(*os.File)
-	if lgout.Name() != out.Name() {
-		errorf(t, out.Name(), out.Name())
-	}
+		out := stdout.(*os.File)
+		SetOutput(out)
+		lgout := std.Lg.Writer().(*os.File)
+		if lgout.Name() != out.Name() {
+			errorf(t, out.Name(), out.Name())
+		}
 
-	prefix := "gorilla"
-	SetPrefix(prefix)
-	if std.Lg.Prefix() != prefix {
-		errorf(t, prefix, std.Lg.Prefix())
-	}
+		prefix := "gorilla"
+		SetPrefix(prefix)
+		if std.Lg.Prefix() != prefix {
+			errorf(t, prefix, std.Lg.Prefix())
+		}
 
-	flag := Ldate
-	SetFlags(flag)
-	if std.Lg.Flags() != flag {
-		errorf(t, flag, std.Lg.Flags())
-	}
+		flag := Ldate
+		SetFlags(flag)
+		if std.Lg.Flags() != flag {
+			errorf(t, flag, std.Lg.Flags())
+		}
+	})
+
+	t.Run("set properties to new logger instance", func(t *testing.T) {
+		logger := New(INFO, "", os.Stdout, Lshortfile)
+		logger.SetMinLevel(TRACE)
+		if logger.MinLevel != TRACE {
+			errorf(t, std.MinLevel.String(), TRACE.String())
+		}
+
+		out := stdout.(*os.File)
+		logger.SetOutput(out)
+		lgout := logger.Lg.Writer().(*os.File)
+		if lgout.Name() != out.Name() {
+			errorf(t, out.Name(), out.Name())
+		}
+
+		prefix := "gorilla"
+		logger.SetPrefix(prefix)
+		if logger.Lg.Prefix() != prefix {
+			errorf(t, prefix, std.Lg.Prefix())
+		}
+
+		flag := Ldate
+		logger.SetFlags(flag)
+		if logger.Lg.Flags() != flag {
+			errorf(t, flag, std.Lg.Flags())
+		}
+	})
 }
 
 func TestStdPrintf(t *testing.T) {
