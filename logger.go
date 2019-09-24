@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -55,8 +56,8 @@ func New(level Level, prefix string, out io.Writer, flag int) *StdLogger {
 var std = New(INFO, "", os.Stdout, log.Lshortfile|log.LstdFlags)
 
 func sdtPrintf(level Level, format string, v ...interface{}) {
-	if std.MinLevel >= level {
-		std.Lg.Printf(level.String()+format+"\n", v)
+	if level >= std.MinLevel {
+		std.Lg.Output(3, fmt.Sprintf(level.String()+format, v...))
 	}
 }
 
@@ -97,7 +98,7 @@ func Errorf(format string, v ...interface{}) {
 }
 
 func (l *StdLogger) logPrintf(level Level, format string, v ...interface{}) {
-	if l.MinLevel >= level {
+	if level >= l.MinLevel {
 		l.Lg.Printf(level.String()+format+"\n", v)
 	}
 }
