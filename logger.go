@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -70,7 +71,7 @@ func New(level Level, prefix string, out io.Writer, flag int) *StdLogger {
 
 var std = New(INFO, "", os.Stdout, Lshortfile|LstdFlags)
 
-func sdtPrintf(level Level, format string, v ...interface{}) {
+func stdPrintf(level Level, format string, v ...interface{}) {
 	if level >= std.MinLevel {
 		std.Lg.Output(3, fmt.Sprintf(level.String()+format, v...))
 	}
@@ -98,27 +99,27 @@ func SetPrefix(prefix string) {
 
 // Tracef output trace log
 func Tracef(format string, v ...interface{}) {
-	sdtPrintf(TRACE, format, v...)
+	sddtPrintf(TRACE, format, v...)
 }
 
 // Debugf output debug log
 func Debugf(format string, v ...interface{}) {
-	sdtPrintf(DEBUG, format, v...)
+	stdPrintf(DEBUG, format, v...)
 }
 
 // Infof outpuut info log
 func Infof(format string, v ...interface{}) {
-	sdtPrintf(INFO, format, v...)
+	stdPrintf(INFO, format, v...)
 }
 
 // Warnf outpuut warnning log
 func Warnf(format string, v ...interface{}) {
-	sdtPrintf(WARN, format, v...)
+	stdPrintf(WARN, format, v...)
 }
 
 // Errorf output error log
 func Errorf(format string, v ...interface{}) {
-	sdtPrintf(ERROR, format, v...)
+	stdPrintf(ERROR, format, v...)
 }
 
 func (l *StdLogger) logPrintf(level Level, format string, v ...interface{}) {
