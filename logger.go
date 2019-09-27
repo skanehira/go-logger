@@ -132,4 +132,7 @@ func PrintToJSON(v interface{}) {
 	}
 }
 
+// PrintStruct outptu struct info
+func PrintStruct(v interface{}) {
+	output(fmt.Sprintf("%#+v", v))
 }

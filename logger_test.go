@@ -137,3 +137,20 @@ func TestPrintJSON(t *testing.T) {
 		buf.Reset()
 	}
 }
+
+func TestPrintStruct(t *testing.T) {
+	v := struct{ Name string }{"gorilla"}
+
+	var buf bytes.Buffer
+	std = &stdLogger{MinLevel: DEBUG, Lg: log.New(&buf, "", 0)}
+
+	PrintStruct(v)
+
+	want := "struct { Name string }{Name:\"gorilla\"}\n"
+
+	if buf.String() != want {
+		errorf(t, want, buf.String())
+	}
+
+	buf.Reset()
+}
