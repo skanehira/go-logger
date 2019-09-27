@@ -17,34 +17,8 @@ func errorf(tb testing.TB, want, got interface{}) {
 	tb.Errorf("want = %+v, got = %+v", want, got)
 }
 
-func makeWantLog(prefix, level, format, args string) string {
-	return prefix + level + fmt.Sprintf(format, args) + "\n"
-}
-
-func TestNew(t *testing.T) {
-	level := INFO
-	out := os.Stdout
-	prefix := "[gorilla]"
-	flag := LstdFlags
-
-	logger := New(level, prefix, out, flag)
-
-	if logger.MinLevel != level {
-		errorf(t, level, logger.MinLevel)
-	}
-
-	if logger.Lg.Flags() != flag {
-		errorf(t, flag, logger.Lg.Flags())
-	}
-
-	if logger.Lg.Prefix() != prefix {
-		errorf(t, prefix, logger.Lg.Prefix())
-	}
-
-	lgout := logger.Lg.Writer().(*os.File)
-	if lgout.Name() != out.Name() {
-		errorf(t, out.Name(), lgout.Name())
-	}
+func makeWantLog(file, prefix, level, format, args string) string {
+	return prefix + file + level + fmt.Sprintf(format, args) + "\n"
 }
 
 func TestLevel(t *testing.T) {
@@ -73,7 +47,7 @@ func TestLevel(t *testing.T) {
 
 func TestSetFuncs(t *testing.T) {
 	t.Run("set properties to global logger instance", func(t *testing.T) {
-		testLogger := New(INFO, "", os.Stdout, Lshortfile)
+		testLogger := &stdLogger{MinLevel: INFO, Lg: log.New(os.Stdout, "", Llongfile|LstdFlags)}
 		oldLogger := std
 		std = testLogger
 		defer func() { std = oldLogger }()
@@ -102,39 +76,12 @@ func TestSetFuncs(t *testing.T) {
 			errorf(t, flag, std.Lg.Flags())
 		}
 	})
-
-	t.Run("set properties to new logger instance", func(t *testing.T) {
-		logger := New(INFO, "", os.Stdout, Lshortfile)
-		logger.SetMinLevel(TRACE)
-		if logger.MinLevel != TRACE {
-			errorf(t, std.MinLevel.String(), TRACE.String())
-		}
-
-		out := stdout.(*os.File)
-		logger.SetOutput(out)
-		lgout := logger.Lg.Writer().(*os.File)
-		if lgout.Name() != out.Name() {
-			errorf(t, out.Name(), out.Name())
-		}
-
-		prefix := "gorilla"
-		logger.SetPrefix(prefix)
-		if logger.Lg.Prefix() != prefix {
-			errorf(t, prefix, std.Lg.Prefix())
-		}
-
-		flag := Ldate
-		logger.SetFlags(flag)
-		if logger.Lg.Flags() != flag {
-			errorf(t, flag, std.Lg.Flags())
-		}
-	})
 }
 
-func TestStdPrintf(t *testing.T) {
+func TestPrintLogLevel(t *testing.T) {
 	var buf bytes.Buffer
 	prefix := "[test] "
-	std = New(DEBUG, prefix, &buf, 0)
+	std = &stdLogger{MinLevel: DEBUG, Lg: log.New(&buf, prefix, Lshortfile)}
 
 	format := "I am %s"
 	args := "gorilla"
@@ -146,10 +93,10 @@ func TestStdPrintf(t *testing.T) {
 		excepted  string
 	}{
 		{"global std trace log", TRACE, Tracef, ""},
-		{"global std debug log", DEBUG, Debugf, makeWantLog(prefix, DEBUG.String(), format, args)},
-		{"global std info log", INFO, Infof, makeWantLog(prefix, INFO.String(), format, args)},
-		{"global std warn log", WARN, Warnf, makeWantLog(prefix, WARN.String(), format, args)},
-		{"global std error log", ERROR, Errorf, makeWantLog(prefix, ERROR.String(), format, args)},
+		{"global std debug log", DEBUG, Debugf, makeWantLog("logger_test.go:106: ", prefix, DEBUG.String(), format, args)},
+		{"global std info log", INFO, Infof, makeWantLog("logger_test.go:106: ", prefix, INFO.String(), format, args)},
+		{"global std warn log", WARN, Warnf, makeWantLog("logger_test.go:106: ", prefix, WARN.String(), format, args)},
+		{"global std error log", ERROR, Errorf, makeWantLog("logger_test.go:106: ", prefix, ERROR.String(), format, args)},
 	}
 
 	for _, test := range tests {
@@ -162,37 +109,15 @@ func TestStdPrintf(t *testing.T) {
 			buf.Reset()
 		})
 	}
+
 }
 
-func TestLoggerPrintf(t *testing.T) {
 	var buf bytes.Buffer
-	prefix := "[test] "
-	std := New(DEBUG, prefix, &buf, 0)
-
-	format := "I am %s"
-	args := "gorilla"
 
 	tests := []struct {
-		name      string
-		level     Level
-		printFunc func(format string, v ...interface{})
-		excepted  string
 	}{
-		{"logger print trace log", TRACE, std.Tracef, ""},
-		{"logger print debug log", DEBUG, std.Debugf, makeWantLog(prefix, DEBUG.String(), format, args)},
-		{"logger print info log", INFO, std.Infof, makeWantLog(prefix, INFO.String(), format, args)},
-		{"logger print warn log", WARN, std.Warnf, makeWantLog(prefix, WARN.String(), format, args)},
-		{"logger print error log", ERROR, std.Errorf, makeWantLog(prefix, ERROR.String(), format, args)},
 	}
 
 	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			excepted := test.excepted
-			test.printFunc(format, args)
-			if buf.String() != excepted {
-				errorf(t, excepted, buf.String())
-			}
-			buf.Reset()
-		})
 	}
 }
