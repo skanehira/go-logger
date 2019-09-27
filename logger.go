@@ -122,6 +122,13 @@ func Errorf(format string, v ...interface{}) {
 	stdPrintf(ERROR, format, v...)
 }
 
+// PrintToJSON output json from struct
+func PrintToJSON(v interface{}) {
+	buf, err := json.Marshal(&v)
+	if err != nil {
+		output(err.Error())
+	} else {
+		output(fmt.Sprintln(string(buf)))
 	}
 }
 

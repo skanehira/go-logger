@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"math"
 	"os"
 	"testing"
 )
@@ -113,12 +114,26 @@ func TestPrintLogLevel(t *testing.T) {
 
 }
 
+func TestPrintJSON(t *testing.T) {
 	var buf bytes.Buffer
+	std = &stdLogger{MinLevel: DEBUG, Lg: log.New(&buf, "", 0)}
 
 	tests := []struct {
+		kind string
+		name string
+		data interface{}
+		want string
 	}{
+		{"success", "success to print json", &struct{ Name string }{"gorilla"}, "{\"Name\":\"gorilla\"}\n"},
+		{"failed", "failed to printj json", math.NaN(), "json: unsupported value: NaN\n"},
 	}
 
 	for _, test := range tests {
+		PrintToJSON(test.data)
+
+		if test.want != buf.String() {
+			errorf(t, test.want, buf.String())
+		}
+		buf.Reset()
 	}
 }
