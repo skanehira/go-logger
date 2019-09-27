@@ -55,25 +55,25 @@ type Logger interface {
 	Errorf(format string, v ...interface{})
 }
 
-// StdLogger is logger struct
-type StdLogger struct {
+type stdLogger struct {
 	MinLevel Level
 	Lg       *log.Logger
 }
 
-// New create a new logger instance
-func New(level Level, prefix string, out io.Writer, flag int) *StdLogger {
-	return &StdLogger{
-		MinLevel: level,
-		Lg:       log.New(out, prefix, flag),
-	}
+var out = &os.Stdout
+
+var std = &stdLogger{
+	MinLevel: INFO,
+	Lg:       log.New(*out, "", Llongfile|LstdFlags),
 }
 
-var std = New(INFO, "", os.Stdout, Lshortfile|LstdFlags)
+func output(str string) {
+	std.Lg.Output(4, str)
+}
 
 func stdPrintf(level Level, format string, v ...interface{}) {
 	if level >= std.MinLevel {
-		std.Lg.Output(3, fmt.Sprintf(level.String()+format, v...))
+		output(fmt.Sprintf(level.String()+format, v...))
 	}
 }
 
@@ -99,7 +99,7 @@ func SetPrefix(prefix string) {
 
 // Tracef output trace log
 func Tracef(format string, v ...interface{}) {
-	sddtPrintf(TRACE, format, v...)
+	stdPrintf(TRACE, format, v...)
 }
 
 // Debugf output debug log
@@ -122,53 +122,7 @@ func Errorf(format string, v ...interface{}) {
 	stdPrintf(ERROR, format, v...)
 }
 
-func (l *StdLogger) logPrintf(level Level, format string, v ...interface{}) {
-	if level >= l.MinLevel {
-		l.Lg.Output(3, fmt.Sprintf(level.String()+format, v...))
 	}
 }
 
-// Tracef output trace log
-func (l *StdLogger) Tracef(format string, v ...interface{}) {
-	l.logPrintf(TRACE, format, v...)
-}
-
-// Debugf output debug log
-func (l *StdLogger) Debugf(format string, v ...interface{}) {
-	l.logPrintf(DEBUG, format, v...)
-}
-
-// Infof outpuut info log
-func (l *StdLogger) Infof(format string, v ...interface{}) {
-	l.logPrintf(INFO, format, v...)
-}
-
-// Warnf outpuut warnning log
-func (l *StdLogger) Warnf(format string, v ...interface{}) {
-	l.logPrintf(WARN, format, v...)
-}
-
-// Errorf output error log
-func (l *StdLogger) Errorf(format string, v ...interface{}) {
-	l.logPrintf(ERROR, format, v...)
-}
-
-// SetMinLevel set the log min level
-func (l *StdLogger) SetMinLevel(level Level) {
-	l.MinLevel = level
-}
-
-// SetOutput set the log output desitnation
-func (l *StdLogger) SetOutput(out io.Writer) {
-	l.Lg.SetOutput(out)
-}
-
-// SetFlags set the log flags
-func (l *StdLogger) SetFlags(flag int) {
-	l.Lg.SetFlags(flag)
-}
-
-// SetPrefix set the log prefix
-func (l *StdLogger) SetPrefix(prefix string) {
-	l.Lg.SetPrefix(prefix)
 }
