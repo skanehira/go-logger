@@ -93,10 +93,10 @@ func TestPrintLogLevel(t *testing.T) {
 		excepted  string
 	}{
 		{"global std trace log", TRACE, Tracef, ""},
-		{"global std debug log", DEBUG, Debugf, makeWantLog("logger_test.go:106: ", prefix, DEBUG.String(), format, args)},
-		{"global std info log", INFO, Infof, makeWantLog("logger_test.go:106: ", prefix, INFO.String(), format, args)},
-		{"global std warn log", WARN, Warnf, makeWantLog("logger_test.go:106: ", prefix, WARN.String(), format, args)},
-		{"global std error log", ERROR, Errorf, makeWantLog("logger_test.go:106: ", prefix, ERROR.String(), format, args)},
+		{"global std debug log", DEBUG, Debugf, makeWantLog("logger_test.go:107: ", prefix, DEBUG.String(), format, args)},
+		{"global std info log", INFO, Infof, makeWantLog("logger_test.go:107: ", prefix, INFO.String(), format, args)},
+		{"global std warn log", WARN, Warnf, makeWantLog("logger_test.go:107: ", prefix, WARN.String(), format, args)},
+		{"global std error log", ERROR, Errorf, makeWantLog("logger_test.go:107: ", prefix, ERROR.String(), format, args)},
 	}
 
 	for _, test := range tests {
